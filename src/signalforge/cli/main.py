@@ -1826,5 +1826,84 @@ def convergence_emergence(
         typer.echo(f"     Contributing: {sig['contributing_theses']}")
 
 
+# ── Unified Analysis Pipeline ──────────────────────────────────────
+@app.command("analyze")
+def unified_analyze(
+    workspace: str = typer.Option("default", "--workspace"),
+    root: Path = typer.Option(default_factory=default_root, file_okay=False, dir_okay=True, resolve_path=True),
+    json_output: bool = typer.Option(False, "--json", help="Output raw JSON"),
+) -> None:
+    """Run all 4 engines: semantic + adversarial + drift + convergence."""
+    import json as json_mod
+    from signalforge.unified import UnifiedAnalyzer
+
+    ws = build_workspace(name=workspace, root=root)
+    theses = [load_json(p) for p in sorted(ws.artifact_dir("thesis").glob("*.json"))]
+    if not theses:
+        typer.echo("No theses found in workspace.")
+        return
+
+    pipeline = UnifiedAnalyzer(provider=_get_semantic_provider())
+    report = pipeline.analyze(theses)
+
+    if json_output:
+        typer.echo(json_mod.dumps(report.to_dict(), indent=2, default=str))
+        return
+
+    health_colors = {
+        "critical": "🔴", "warning": "🟠", "healthy": "🟢",
+        "opportunity_rich": "💎", "unknown": "⚪",
+    }
+    icon = health_colors.get(report.portfolio_health, "⚪")
+    typer.echo(f"\n{icon} SignalForge Unified Analysis")
+    typer.echo(f"   Portfolio Health: {report.portfolio_health.upper()}")
+    typer.echo(f"   Theses Analyzed: {len(report.theses)}")
+    typer.echo(f"   Top Priority: {report.top_priority or 'None'}")
+    typer.echo()
+
+    # Adversarial results
+    typer.echo("── Adversarial Audit ──")
+    for tid, r in report.adversarial_results.items():
+        status_colors = {"green": "🟢", "yellow": "🟡", "orange": "🟠", "red": "🔴"}
+        si = status_colors.get(r.get("status", ""), "⚪")
+        typer.echo(f"  {si} {tid}: {r.get('status', '?').upper()} (vuln: {r.get('vulnerability_score', '?')})")
+        if r.get("recommendation"):
+            typer.echo(f"     {r['recommendation'][:80]}")
+
+    # Drift results
+    typer.echo("\n── Signal Drift ──")
+    phase_icons = {"emerging": "🟢", "strengthening": "📈", "stable": "⚖️", "decaying": "📉", "dormant": "💤"}
+    for tid, r in report.drift_results.items():
+        phase = r.get("classification", "unknown")
+        pi = phase_icons.get(phase, "⚪")
+        momentum = r.get("momentum", 0)
+        typer.echo(f"  {pi} {tid}: {phase} (momentum: {momentum:.3f})")
+
+    # Convergence
+    if report.convergence_points:
+        typer.echo("\n── Convergence Radar ──")
+        for cp in report.convergence_points:
+            strength = cp.get("signal_strength", "weak")
+            strength_icons = {"supersignal": "🔥", "strong": "🔴", "moderate": "🟡", "weak": "⚪"}
+            si = strength_icons.get(strength, "⚪")
+            typer.echo(f"  {si} {strength.upper()}: {cp.get('thesis_ids', [])}")
+            typer.echo(f"     Score: {cp.get('convergence_score', 0)} | Type: {cp.get('convergence_type', '?')}")
+
+    # Emergence
+    if report.emergence_signals:
+        typer.echo("\n── Emergence Signals ──")
+        for sig in report.emergence_signals:
+            typer.echo(f"  🔥 {sig.get('signal_strength', '?').upper()}: {sig.get('opportunity_space', '')[:80]}")
+
+    # Summary recommendation
+    summary = report.to_dict().get("summary", {})
+    typer.echo(f"\n── Summary ──")
+    typer.echo(f"  Total theses: {summary.get('total_theses', 0)}")
+    typer.echo(f"  At risk: {summary.get('at_risk_count', 0)}")
+    typer.echo(f"  Strengthening: {summary.get('strengthening_count', 0)}")
+    typer.echo(f"  Convergence points: {summary.get('convergence_count', 0)}")
+    typer.echo(f"  Emergence signals: {summary.get('emergence_count', 0)}")
+
+
 if __name__ == "__main__":
     app()
