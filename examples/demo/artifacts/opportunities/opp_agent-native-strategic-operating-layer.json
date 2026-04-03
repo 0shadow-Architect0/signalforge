@@ -1,0 +1,20 @@
+{
+  "id": "opp_agent-native-strategic-operating-layer",
+  "derived_from": [
+    "src_repo_gstack",
+    "src_repo_paperclip"
+  ],
+  "title": "Agent-native strategic operating layer",
+  "scores": {
+    "novelty": 8.4,
+    "urgency": 7.8,
+    "founder_fit": 8.8,
+    "buildability": 7.9,
+    "monetization": 8.2,
+    "strategic_leverage": 9.0
+  },
+  "recommended_motion": "advance",
+  "workspace": "demo",
+  "created_at": "2026-04-02T22:36:26.247883",
+  "updated_at": "2026-04-02T22:36:26+00:00"
+}

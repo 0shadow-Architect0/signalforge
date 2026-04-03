@@ -1,0 +1,14 @@
+workspace: signalforge-lab
+sources:
+  - type: repo
+    uri: https://github.com/example/agent-memory
+    title: agent-memory
+  - type: paper
+    uri: https://arxiv.org/abs/2601.12345
+    title: Strategic Memory Systems for Autonomous Builders
+  - type: article
+    uri: https://example.com/builder-direction-overload
+    title: Builders Need Direction, Not More Inputs
+  - type: note
+    path: ./notes/founder-thesis.md
+    title: Rough founder note

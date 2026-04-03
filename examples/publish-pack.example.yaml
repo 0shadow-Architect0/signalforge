@@ -1,0 +1,18 @@
+id: publish_pack_001
+workspace: signalforge-lab
+target: github_open_source_launch
+narrative_mode: category-defining
+source_artifacts:
+  - thesis_signalforge-001
+  - decision_build_signalforge-001
+  - exp_public-demo-pack-001
+redaction_policy:
+  remove_private_notes: true
+  remove_portfolio_references: true
+  replace_source_names_with_descriptors: true
+outputs:
+  - README.md
+  - docs/architecture.md
+  - docs/command-contracts.md
+  - examples/example-artifact-pack/
+  - launch/snippets.md

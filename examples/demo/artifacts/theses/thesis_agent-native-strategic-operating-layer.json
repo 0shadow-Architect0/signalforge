@@ -1,0 +1,14 @@
+{
+  "id": "thesis_agent-native-strategic-operating-layer",
+  "name": "Agent-native strategic operating layer",
+  "one_line_thesis": "Agent-native strategic operating layer is a decision-grade system that transforms heterogeneous signals into durable product direction artifacts.",
+  "status": "active",
+  "workspace": "demo",
+  "source_ids": [
+    "src_repo_gstack",
+    "src_repo_paperclip"
+  ],
+  "opportunity_id": "opp_agent-native-strategic-operating-layer",
+  "created_at": "2026-04-02T22:36:26.248125",
+  "updated_at": "2026-04-02T22:36:26+00:00"
+}

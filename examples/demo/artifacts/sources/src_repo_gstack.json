@@ -1,0 +1,10 @@
+{
+  "id": "src_repo_gstack",
+  "type": "repo",
+  "title": "gstack",
+  "uri": "https://github.com/garrytan/gstack",
+  "summary": "Role-specialized software factory for Claude Code.",
+  "captured_at": "2026-04-02T22:36:25.878801",
+  "workspace": "demo",
+  "updated_at": "2026-04-02T22:36:25+00:00"
+}
