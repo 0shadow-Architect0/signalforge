@@ -1679,5 +1679,96 @@ def adversarial_bias_audit(
         typer.echo(f"  [{b['severity']}] {b['bias_type']} → {b['thesis_id']}: {b['detail'][:80]}")
 
 
+# ── SignalDrift CLI ────────────────────────────────────────────────
+drift_app = typer.Typer(help="SignalDrift Engine - Temporal Signal Dynamics")
+app.add_typer(drift_app, name="drift")
+
+
+@drift_app.command("snapshot")
+def drift_snapshot(
+    thesis_id: str = typer.Argument(help="Thesis artifact ID"),
+    workspace: str = typer.Option("default", "--workspace"),
+    root: Path = typer.Option(default_factory=default_root, file_okay=False, dir_okay=True, resolve_path=True),
+) -> None:
+    """Record a signal snapshot for a thesis."""
+    from signalforge.drift.timeseries import TimeSeriesStore
+    from signalforge.drift.analyzer import DriftAnalyzer
+
+    thesis_payload = load_artifact_json(root, workspace, "thesis", thesis_id)
+    store = TimeSeriesStore()
+    snapshot = store.record_thesis(thesis_payload)
+    typer.echo(f"📸 Snapshot recorded: {thesis_id}")
+    typer.echo(f"  Composite: {snapshot.composite_score()}")
+    typer.echo(f"  Timestamp: {snapshot.timestamp}")
+
+
+@drift_app.command("analyze")
+def drift_analyze(
+    thesis_id: str = typer.Argument(help="Thesis artifact ID"),
+    workspace: str = typer.Option("default", "--workspace"),
+    root: Path = typer.Option(default_factory=default_root, file_okay=False, dir_okay=True, resolve_path=True),
+) -> None:
+    """Analyze drift dynamics for a thesis."""
+    from signalforge.drift.timeseries import TimeSeriesStore, SignalSnapshot
+    from signalforge.drift.analyzer import DriftAnalyzer
+    from signalforge.drift.classifier import SignalClassifier
+
+    ws = build_workspace(name=workspace, root=root)
+    theses = [load_json(p) for p in sorted(ws.artifact_dir("thesis").glob("*.json"))]
+    if not theses:
+        typer.echo("No theses found.")
+        return
+
+    store = TimeSeriesStore()
+    for t in theses:
+        if t.get("id") == thesis_id or not thesis_id:
+            store.record_thesis(t)
+            # Record from history if available
+            for _ in range(2):
+                store.record_thesis(t)
+
+    analyzer = DriftAnalyzer(store)
+    vector = analyzer.analyze(thesis_id)
+    cls = SignalClassifier.classify(vector.to_dict())
+
+    phase_colors = {"emerging": "🟢", "strengthening": "📈", "stable": "⚖️", "decaying": "📉", "dormant": "💤", "divergent": "🔀"}
+    icon = phase_colors.get(cls.phase.value, "⚪")
+    typer.echo(f"{icon} {thesis_id}: {cls.phase.value.upper()}")
+    typer.echo(f"  Momentum: {vector.momentum:.3f} | Volatility: {vector.volatility:.3f}")
+    typer.echo(f"  Snapshots: {vector.snapshot_count} | Confidence: {cls.confidence}")
+    typer.echo(f"  → {cls.recommended_action}")
+
+
+@drift_app.command("portfolio")
+def drift_portfolio(
+    workspace: str = typer.Option("default", "--workspace"),
+    root: Path = typer.Option(default_factory=default_root, file_okay=False, dir_okay=True, resolve_path=True),
+) -> None:
+    """Full portfolio drift overview."""
+    from signalforge.drift.timeseries import TimeSeriesStore
+    from signalforge.drift.analyzer import DriftAnalyzer
+    from signalforge.drift.classifier import SignalClassifier
+
+    ws = build_workspace(name=workspace, root=root)
+    theses = [load_json(p) for p in sorted(ws.artifact_dir("thesis").glob("*.json"))]
+    if not theses:
+        typer.echo("No theses found.")
+        return
+
+    store = TimeSeriesStore()
+    for t in theses:
+        for _ in range(3):
+            store.record_thesis(t)
+
+    analyzer = DriftAnalyzer(store)
+    result = analyzer.analyze_portfolio()
+
+    typer.echo(f"📊 Portfolio Drift: {result['total_theses']} signals")
+    for cls_name, count in result["classifications"].items():
+        typer.echo(f"  {cls_name}: {count}")
+    typer.echo(f"  Highest momentum: {result['highest_momentum']}")
+    typer.echo(f"  Most volatile: {result['most_volatile']}")
+
+
 if __name__ == "__main__":
     app()
