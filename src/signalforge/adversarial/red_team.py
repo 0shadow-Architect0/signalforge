@@ -105,7 +105,7 @@ class RedTeamBuilder:
         
         Returns None if provider unavailable (graceful degradation).
         """
-        if not self.provider.available():
+        if not self.provider or not self.provider.available():
             return self._deterministic_red_team(thesis_payload)
         
         # Gather thesis data

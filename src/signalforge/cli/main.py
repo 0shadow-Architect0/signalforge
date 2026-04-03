@@ -1588,5 +1588,96 @@ def portfolio_map(
     typer.echo(artifact_id)
 
 
+# ── Adversarial Engine CLI ──────────────────────────────────────────
+adversarial_app = typer.Typer(help="Adversarial Thesis Engine (Red Team AI)")
+app.add_typer(adversarial_app, name="adversarial")
+
+
+@adversarial_app.command("audit")
+def adversarial_audit(
+    thesis_id: str = typer.Argument(help="Thesis artifact ID"),
+    workspace: str = typer.Option("default", "--workspace"),
+    root: Path = typer.Option(default_factory=default_root, file_okay=False, dir_okay=True, resolve_path=True),
+) -> None:
+    """Run adversarial audit: kill criteria + red team + bias check."""
+    from signalforge.adversarial.engine import AdversarialEngine
+
+    thesis_payload = load_artifact_json(root, workspace, "thesis", thesis_id)
+    engine = AdversarialEngine(provider=_get_semantic_provider())
+    result = engine.audit_thesis(thesis_payload)
+    colors = {"green": "🟢", "yellow": "🟡", "orange": "🟠", "red": "🔴"}
+    typer.echo(f"{colors.get(result['status'], '⚪')} {thesis_id}: {result['status'].upper()}")
+    typer.echo(f"  Vulnerability: {result['vulnerability_score']} | Kill Criteria: {result['kill_criteria_triggered']}/{result['kill_criteria_total']}")
+    if result.get("anti_thesis"):
+        typer.echo(f"  Anti-Thesis: {result['anti_thesis'][:150]}...")
+    typer.echo(f"  → {result['recommendation']}")
+
+
+@adversarial_app.command("stress-test")
+def adversarial_stress_test(
+    workspace: str = typer.Option("default", "--workspace"),
+    root: Path = typer.Option(default_factory=default_root, file_okay=False, dir_okay=True, resolve_path=True),
+) -> None:
+    """Portfolio-level stress test across all theses."""
+    from signalforge.adversarial.engine import AdversarialEngine
+
+    ws = build_workspace(name=workspace, root=root)
+    theses = [load_json(p) for p in sorted(ws.artifact_dir("thesis").glob("*.json"))]
+    if not theses:
+        typer.echo("No theses found.")
+        return
+    engine = AdversarialEngine(provider=_get_semantic_provider())
+    result = engine.portfolio_stress_test(theses)
+    colors = {"green": "🟢", "yellow": "🟡", "orange": "🟠", "red": "🔴"}
+    typer.echo(f"{colors.get(result['portfolio_alert_level'], '⚪')} Portfolio: {len(theses)} theses, risk={result['composite_risk']}")
+    typer.echo(f"  At risk: {result['theses_at_risk']} | Bias: {result['bias_health']}")
+    typer.echo(f"  → {result['recommendation']}")
+
+
+@adversarial_app.command("red-team")
+def adversarial_red_team(
+    thesis_id: str = typer.Argument(help="Thesis artifact ID"),
+    workspace: str = typer.Option("default", "--workspace"),
+    root: Path = typer.Option(default_factory=default_root, file_okay=False, dir_okay=True, resolve_path=True),
+) -> None:
+    """Build strongest argument AGAINST a thesis."""
+    from signalforge.adversarial.red_team import RedTeamBuilder
+
+    thesis_payload = load_artifact_json(root, workspace, "thesis", thesis_id)
+    builder = RedTeamBuilder(_get_semantic_provider())
+    result = builder.build_red_team(thesis_payload)
+    if not result:
+        typer.echo("Red team failed.")
+        return
+    typer.echo(f"⚔️ Red Team: {thesis_id}")
+    typer.echo(f"  Anti-Thesis: {result.get('anti_thesis', 'N/A')[:200]}")
+    typer.echo(f"  Vulnerability: {result.get('overall_vulnerability_score', 'N/A')}")
+    typer.echo(f"  Steel-Man: {result.get('steel_man_opposition', 'N/A')[:200]}")
+    for a in result.get("load_bearing_assumptions", []):
+        typer.echo(f"  ⚠ {a.get('assumption', '?')} (fail prob: {a.get('failure_probability', '?')})")
+    for m in result.get("failure_modes", []):
+        typer.echo(f"  ✗ {m.get('mode', '?')}: {m.get('description', '')[:80]}")
+
+
+@adversarial_app.command("bias-audit")
+def adversarial_bias_audit(
+    workspace: str = typer.Option("default", "--workspace"),
+    root: Path = typer.Option(default_factory=default_root, file_okay=False, dir_okay=True, resolve_path=True),
+) -> None:
+    """Audit confirmation bias across all theses."""
+    from signalforge.adversarial.bias_tracker import BiasTracker
+
+    ws = build_workspace(name=workspace, root=root)
+    theses = [load_json(p) for p in sorted(ws.artifact_dir("thesis").glob("*.json"))]
+    if not theses:
+        typer.echo("No theses found.")
+        return
+    audit = BiasTracker.portfolio_bias_audit(theses)
+    colors = {"healthy": "🟢", "warning": "🟡", "critical": "🔴"}
+    typer.echo(f"{colors.get(audit['overall_health'], '⚪')} Bias Audit: {audit['total_theses']} theses, {audit['theses_with_bias']} biased")
+    for b in audit.get("biases_found", []):
+        typer.echo(f"  [{b['severity']}] {b['bias_type']} → {b['thesis_id']}: {b['detail'][:80]}")
+
+
 if __name__ == "__main__":
     app()
