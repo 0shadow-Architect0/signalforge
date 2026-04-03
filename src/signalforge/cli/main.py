@@ -1770,5 +1770,61 @@ def drift_portfolio(
     typer.echo(f"  Most volatile: {result['most_volatile']}")
 
 
+# ── Convergence Radar CLI ──────────────────────────────────────────
+convergence_app = typer.Typer(help="Convergence Radar - Cross-Domain Intersection Detection")
+app.add_typer(convergence_app, name="convergence")
+
+
+@convergence_app.command("scan")
+def convergence_scan(
+    workspace: str = typer.Option("default", "--workspace"),
+    root: Path = typer.Option(default_factory=default_root, file_okay=False, dir_okay=True, resolve_path=True),
+) -> None:
+    """Scan all theses for convergence patterns."""
+    from signalforge.convergence.radar import ConvergenceRadar
+
+    ws = build_workspace(name=workspace, root=root)
+    theses = [load_json(p) for p in sorted(ws.artifact_dir("thesis").glob("*.json"))]
+    if not theses:
+        typer.echo("No theses found.")
+        return
+
+    radar = ConvergenceRadar()
+    points = radar.scan(theses)
+    if not points:
+        typer.echo("No convergence detected.")
+        return
+
+    strength_icons = {"supersignal": "🔴", "strong": "🟠", "moderate": "🟡", "weak": "⚪"}
+    for p in points:
+        d = p.to_dict()
+        icon = strength_icons.get(d["signal_strength"], "⚪")
+        typer.echo(f"{icon} {d['signal_strength'].upper()}: {d['thesis_ids']}")
+        typer.echo(f"  Score: {d['convergence_score']} | Type: {d['convergence_type']}")
+        typer.echo(f"  Space: {d['opportunity_space'][:80]}")
+
+
+@convergence_app.command("emergence")
+def convergence_emergence(
+    workspace: str = typer.Option("default", "--workspace"),
+    root: Path = typer.Option(default_factory=default_root, file_okay=False, dir_okay=True, resolve_path=True),
+) -> None:
+    """Detect emergent opportunities from signal convergence."""
+    from signalforge.convergence.radar import ConvergenceRadar
+
+    ws = build_workspace(name=workspace, root=root)
+    theses = [load_json(p) for p in sorted(ws.artifact_dir("thesis").glob("*.json"))]
+    if not theses:
+        typer.echo("No theses found.")
+        return
+
+    radar = ConvergenceRadar()
+    result = radar.detect_emergence(theses)
+    typer.echo(f"📡 Emergence Scan: {result['total_convergence_points']} convergence points")
+    for sig in result["emergence_signals"]:
+        typer.echo(f"  🔥 {sig['signal_strength'].upper()}: {sig['opportunity_space'][:80]}")
+        typer.echo(f"     Contributing: {sig['contributing_theses']}")
+
+
 if __name__ == "__main__":
     app()
