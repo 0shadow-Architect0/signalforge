@@ -1,140 +1,185 @@
 # SignalForge
 
-**Research in. Direction out.**
-
-SignalForge is an open-source product direction engine for builders who ingest too much signal and refuse to build blindly.
-It turns repositories, papers, articles, market observations, and founder notes into **decision-grade strategic artifacts**: insights, opportunity evaluations, product theses, decision memos, experiment packs, and portfolio maps.
-
-SignalForge is not a chat wrapper, a note app, or a backlog manager.
-It is the operating layer between raw input and committed execution.
-
-## Why SignalForge exists
-Builders are surrounded by promising fragments:
-- an interesting GitHub repo
-- a research paper with one powerful primitive
-- an article that reveals a market shift
-- scattered founder notes about something worth building
-
-The hard part is not collecting those signals.
-The hard part is turning them into a coherent product direction with explicit tradeoffs and durable memory.
-
-That is what SignalForge is for.
-
-## Core outcome
-```mermaid
-flowchart LR
-    A[Repos / Papers / Articles / Notes] --> B[Intake]
-    B --> C[Analysis]
-    C --> D[Insights]
-    C --> E[Opportunities]
-    C --> F[Comparables + Risks]
-    D --> G[Product Thesis]
-    E --> G
-    F --> H[Decision Memo]
-    G --> H
-    H --> I[Experiment Pack]
-    G --> J[Portfolio Memory]
-    H --> J
-```
-
-## What SignalForge produces
-- canonical source briefs
-- insight memos
-- opportunity evaluations
-- product theses
-- decision memos
-- experiment packs
-- portfolio review artifacts
-
-## Product principles
-- **artifact-first** rather than conversation-first
-- **portfolio memory** rather than isolated runs
-- **decision lineage** rather than recommendation theater
-- **local-first core** for sensitive builder material
-- **markdown + JSON dual surface** for human review and machine reliability
-
-## Commanded system
-SignalForge is designed as a deliberate operating system, not an ambiguous prompt box.
-
-```bash
-forge intake add https://github.com/example/repo --type repo --workspace signalforge-lab
-forge analyze compare --source src_repo_001 --source src_paper_004 --source src_note_002
-forge thesis create --source src_repo_001 --source src_paper_004 --title "Strategic builder memory engine"
-forge evidence audit thesis_signalforge-001 --workspace signalforge-lab
-forge decide evaluate thesis_signalforge-001 --explain
-forge decide commit thesis_signalforge-001 --decision build
-forge portfolio review --workspace signalforge-lab
-forge portfolio rebalance --workspace signalforge-lab
-```
+Strategic signal intelligence platform. Detect, track, and analyze opportunity signals across domains using adversarial red teams, temporal drift analysis, and cross-domain convergence radar.
 
 ## Architecture
-```mermaid
-flowchart TD
-    UI[CLI / API / future UI] --> WF[Workflow Orchestrator]
-    WF --> IN[Intake Domain]
-    WF --> AN[Analysis Domain]
-    WF --> AF[Artifact Foundry]
-    WF --> DG[Decision Graph]
-    IN --> ST[(Workspace + Store)]
-    AN --> ST
-    AF --> ST
-    DG --> ST
-    ST --> EX[Exports / Publish Packs / Repo Plans]
+
+SignalForge has 4 specialized engines that work independently or together through the unified analysis pipeline:
+
+```
+Sources ──► Semantic Layer ──► Adversarial Engine
+                │                    │
+                ▼                    ▼
+          SignalDrift Engine ──► Convergence Radar
+                │                    │
+                └────► Unified Analysis ──► Report
 ```
 
-## Repository map
-```text
+### 1. Semantic Intelligence Layer
+LLM-powered enrichment of sources, comparisons, contradictions, and whitespace analysis. Works with any OpenAI-compatible provider.
+
+**Supported providers:** Zhipu AI (GLM-5), OpenAI, Ollama, vLLM, Together AI, Groq, Mistral
+
+### 2. Adversarial Thesis Engine
+Red-team your own strategic theses before the market does.
+
+- **Kill Criteria Monitor** - generates and monitors conditions that would invalidate a thesis
+- **Red Team Builder** - constructs the strongest possible argument against your thesis
+- **Bias Tracker** - detects confirmation bias, anchoring, and motivated reasoning across your portfolio
+
+### 3. SignalDrift Engine
+Track how your signals evolve over time. Every signal is a living entity with velocity, acceleration, and momentum.
+
+- **TimeSeriesStore** - records signal snapshots at each analysis pass
+- **DriftAnalyzer** - computes velocity (rate of change per dimension), acceleration, momentum, and volatility
+- **SignalClassifier** - classifies signal lifecycle phase: EMERGING, STRENGTHENING, STABLE, DECAYING, DORMANT
+- **Divergence Detection** - finds when related signals split in opposite directions
+
+### 4. Convergence Radar
+Detect when signals from different domains converge on the same opportunity space. When 3+ signals converge, that's a super-signal worth 10x more than any individual signal.
+
+- **OverlapDetector** - multi-dimensional similarity computation
+- **ConvergenceRadar** - cluster detection with graph-based grouping
+- **Emergence Detection** - meta-signal when convergence + strengthening = new opportunity
+
+## Installation
+
+```bash
+git clone https://github.com/0shadow-Architect0/signalforge.git
+cd signalforge
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .
+```
+
+## Quick Start
+
+### Add a source
+```bash
+forge source add "https://arxiv.org/abs/2401.xxxxx" --type paper
+```
+
+### Create a thesis
+```bash
+forge thesis create my-thesis --name "AI Agent Infrastructure"
+```
+
+### Run unified analysis
+```bash
+forge analyze
+```
+
+### Individual engine commands
+```bash
+forge adversarial audit my-thesis          # Full adversarial audit
+forge adversarial red-team my-thesis       # Build anti-thesis
+forge adversarial stress-test              # Portfolio stress test
+forge adversarial bias-audit               # Confirmation bias check
+
+forge drift snapshot my-thesis             # Record signal snapshot
+forge drift analyze my-thesis              # Show velocity/momentum
+forge drift portfolio                      # Full drift overview
+
+forge convergence scan                     # Find convergence patterns
+forge convergence emergence                # Detect emergent opportunities
+
+forge semantic status                      # Check provider config
+forge semantic test                        # Test LLM connection
+```
+
+### JSON output
+```bash
+forge analyze --json | jq '.summary'
+```
+
+## Configuration
+
+### LLM Provider (optional - works without LLM in deterministic mode)
+
+```bash
+# Zhipu AI GLM-5
+export SF_SEMANTIC_PROVIDER=openai
+export SF_SEMANTIC_BASE_URL=https://open.bigmodel.cn/api/paas/v4
+export SF_SEMANTIC_API_KEY=your_key_here
+export SF_SEMANTIC_MODEL=glm-5
+
+# OpenAI
+export SF_SEMANTIC_PROVIDER=openai
+export SF_SEMANTIC_API_KEY=sk-...
+export SF_SEMANTIC_MODEL=gpt-4o-mini
+
+# Ollama (local)
+export SF_SEMANTIC_PROVIDER=openai
+export SF_SEMANTIC_BASE_URL=http://localhost:11434/v1
+export SF_SEMANTIC_API_KEY=ollama
+export SF_SEMANTIC_MODEL=llama3
+```
+
+When no provider is configured, all engines run in deterministic mode using heuristic algorithms.
+
+### Persistence
+
+SignalForge uses SQLite (`~/.signalforge/signalforge.db`) to persist snapshots, reports, and convergence events across sessions.
+
+## Project Structure
+
+```
 signalforge/
-├── README.md
-├── pyproject.toml
-├── docs/
-│   ├── architecture.md
-│   ├── artifact-schemas.md
-│   ├── command-contracts.md
-│   ├── decision-evaluation.md
-│   ├── decision-graph.md
-│   ├── portfolio-review.md
-│   ├── publish-pack.md
-│   └── workspace-model.md
 ├── src/signalforge/
-│   ├── cli/
-│   ├── domains/
-│   ├── models/
-│   ├── renderers/
-│   └── workflows/
-└── examples/
+│   ├── adversarial/          # Red team + kill criteria + bias tracking
+│   │   ├── engine.py         # Full adversarial orchestration
+│   │   ├── kill_criteria.py  # Kill condition monitoring
+│   │   ├── red_team.py       # Anti-thesis builder
+│   │   ├── bias_tracker.py   # Confirmation bias detection
+│   │   └── config.py
+│   ├── drift/                # Temporal signal dynamics
+│   │   ├── timeseries.py     # Snapshot store
+│   │   ├── analyzer.py       # Velocity/acceleration/momentum
+│   │   ├── classifier.py     # Lifecycle phase classification
+│   │   └── config.py
+│   ├── convergence/          # Cross-domain intersection detection
+│   │   ├── radar.py          # Cluster + emergence detection
+│   │   ├── overlap.py        # Multi-dimensional similarity
+│   │   └── config.py
+│   ├── semantic/             # LLM-powered enrichment
+│   │   ├── provider.py       # OpenAI-compatible provider
+│   │   ├── enricher.py       # Source/comparison/whitespace enrichment
+│   │   ├── evidence.py       # Evidence chain extraction
+│   │   ├── prompts.py        # LLM prompt templates
+│   │   └── config.py
+│   ├── unified.py            # All-engine pipeline + report
+│   ├── persistence.py        # SQLite backend
+│   ├── analysis.py           # Core analysis functions
+│   ├── models.py             # Pydantic data models
+│   ├── artifacts.py          # Artifact persistence
+│   ├── workspace.py          # Workspace management
+│   └── cli/main.py           # Typer CLI with all commands
+├── tests/                    # 52 passing tests
+│   ├── test_semantic.py
+│   ├── test_adversarial.py
+│   ├── test_drift.py
+│   ├── test_convergence.py
+│   └── test_smoke.py
+└── pyproject.toml
 ```
 
-## Documentation
-- `docs/architecture.md` — system domains and flow
-- `docs/artifact-schemas.md` — typed artifact chain across markdown and JSON
-- `docs/command-contracts.md` — CLI contract and artifact outputs
-- `docs/decision-evaluation.md` — scorecards, confidence, posture rules, and review horizons
-- `docs/decision-graph.md` — state transitions, evidence bundles, and portfolio causality
-- `docs/evidence-freshness.md` — trust dimensions, freshness audits, and revisit triggers
-- `docs/portfolio-review.md` — review lanes, drift taxonomy, and portfolio attention logic
-- `docs/publish-pack.md` — controlled transformation from private strategy to public repo surface
-- `docs/workspace-model.md` — workspace topology and strategic memory shape
+## Signal Lifecycle
 
-## Open-source posture
-The open-source repository should expose the product architecture, schemas, examples, and operating model.
-Sensitive founder material and private strategic history remain local.
+```
+EMERGING ──► STRENGTHENING ──► STABLE ──► DECAYING ──► DORMANT
+   │              │               │           │            │
+   └─ invest ─────┘               └─ monitor ─┘            └─ prune
+```
 
-## Product direction
-SignalForge is being shaped as a coherent strategic system from the beginning:
-- intake fabric for heterogeneous sources
-- strategic analysis engine for extraction, comparison, scoring, and synthesis
-- evidence freshness layer for trust, convergence, contradiction, and revisit timing
-- artifact foundry for durable outputs
-- decision graph for rationale and state transitions
-- execution bridge for repo plans, issue packs, and launch materials
+## Convergence Types
 
-## Public presence system
-SignalForge is also designed to convert internal direction into a public product surface through curated publish packs.
-That gives the system a clean bridge from private strategic work to open-source documentation, example artifacts, and launch narrative.
+| Type | Meaning | Action |
+|------|---------|--------|
+| Synergistic | Complementary capabilities, high overlap | Merge resources |
+| Competing | Same capabilities, same space | Pick one, abandon the other |
+| Complementary | Different capabilities, shared space | Build integration |
+| Orthogonal | No meaningful overlap | Track separately |
 
-## Category claim
-SignalForge is the **product direction layer** for solo builders, open-source strategists, and agent-native teams.
+## License
 
-## Status
-Repository scaffold established locally with a working CLI artifact flow for intake, analysis, thesis formation, decision commits, execution packs, evidence audits, portfolio review, portfolio rebalance, and public export surfaces.
+MIT
