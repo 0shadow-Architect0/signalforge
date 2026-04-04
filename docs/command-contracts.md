@@ -17,6 +17,9 @@ mindmap
       compare
       whitespaces
       portfolio
+    semantic
+      status
+      test
     evidence
       audit
       refresh
@@ -31,6 +34,18 @@ mindmap
     experiment
       create
       pack
+    adversarial
+      audit
+      stress-test
+      red-team
+      bias-audit
+    drift
+      snapshot
+      analyze
+      portfolio
+    convergence
+      scan
+      emergence
     portfolio
       map
       review
@@ -79,6 +94,21 @@ forge analyze compare --source src_repo_001 --source src_paper_004 --source src_
 - `insights/insight_compare_*.md`
 - `opportunities/opp_*.md`
 - optional JSON companions
+
+### `forge semantic status`
+Show semantic layer configuration status.
+
+**Returns**
+- enabled/disabled state
+- provider name
+- model, base URL, temperature, max tokens
+- guidance for enabling if disabled
+
+### `forge semantic test`
+Test semantic layer connectivity.
+
+**Returns**
+- connection success/failure confirmation
 
 ### `forge evidence audit`
 Inspect the vitality of the evidence supporting a thesis or decision bundle.
@@ -151,6 +181,150 @@ Generate an execution package from a committed decision.
 - launch hypothesis
 - artifact references
 
+### `forge adversarial audit`
+Run a full adversarial audit on a single thesis: kill criteria, red team analysis, and bias detection.
+
+**Example**
+```bash
+forge adversarial audit thesis_signalforge-001 --workspace signalforge-lab
+```
+
+**Returns**
+- overall status (green/yellow/orange/red)
+- vulnerability score
+- kill criteria triggered vs total
+- anti-thesis summary
+- bias indicators
+- actionable recommendation
+
+### `forge adversarial stress-test`
+Run portfolio-level stress test across all theses.
+
+**Example**
+```bash
+forge adversarial stress-test --workspace signalforge-lab
+```
+
+**Returns**
+- portfolio alert level (green/yellow/orange/red)
+- composite risk score
+- theses at risk count
+- bias health status
+- groupthink risks
+- portfolio-level recommendation
+
+### `forge adversarial red-team`
+Build the strongest possible case against a thesis (steel-man opposition).
+
+**Example**
+```bash
+forge adversarial red-team thesis_signalforge-001 --workspace signalforge-lab
+```
+
+**Returns**
+- anti-thesis statement
+- anti-thesis confidence
+- load-bearing assumptions with failure probability
+- counter-evidence search queries
+- failure modes with early warning signals
+- steel-man opposition
+- market concerns, timing risks, execution traps
+- overall vulnerability score
+
+### `forge adversarial bias-audit`
+Audit confirmation bias across all theses in a workspace.
+
+**Example**
+```bash
+forge adversarial bias-audit --workspace signalforge-lab
+```
+
+**Returns**
+- overall health (healthy/warning/critical)
+- bias rate
+- individual bias findings per thesis
+- bias types: evidence_asymmetry, anchoring, motivated_reasoning
+- groupthink risks across the portfolio
+
+### `forge drift snapshot`
+Record a signal snapshot for a thesis, capturing its current multi-dimensional score state.
+
+**Example**
+```bash
+forge drift snapshot thesis_signalforge-001 --workspace signalforge-lab
+```
+
+**Returns**
+- snapshot confirmation
+- composite score
+- timestamp
+
+### `forge drift analyze`
+Analyze temporal drift dynamics for a single thesis across accumulated snapshots.
+
+**Example**
+```bash
+forge drift analyze thesis_signalforge-001 --workspace signalforge-lab
+```
+
+**Returns**
+- signal phase (emerging/strengthening/stable/decaying/dormant/volatile)
+- momentum score
+- volatility score
+- velocity vector across all dimensions
+- snapshot count and confidence
+- recommended action
+
+### `forge drift portfolio`
+Full portfolio drift overview across all theses.
+
+**Example**
+```bash
+forge drift portfolio --workspace signalforge-lab
+```
+
+**Returns**
+- total theses tracked
+- classification distribution
+- highest momentum thesis
+- most volatile thesis
+- per-thesis drift details
+
+### `forge convergence scan`
+Scan all theses for cross-domain convergence patterns.
+
+**Example**
+```bash
+forge convergence scan --workspace signalforge-lab
+```
+
+**Returns**
+- convergence points sorted by score
+- signal strength (supersignal/strong/moderate/weak)
+- convergence type (complementary/competing/synergistic/orthogonal)
+- opportunity space description
+- contributing thesis IDs
+
+### `forge convergence emergence`
+Detect emergent opportunities from signal convergence across theses.
+
+**Example**
+```bash
+forge convergence emergence --workspace signalforge-lab
+```
+
+**Returns**
+- total convergence points found
+- strong signal count
+- emergent opportunity descriptions
+- contributing theses per opportunity
+
+### `forge analyze` (unified)
+Run all 4 engines together: semantic + adversarial + drift + convergence.
+
+**Returns**
+- unified analysis report combining all engine outputs
+
 ### `forge portfolio review`
 Produce an updated view of all active directions, their evidence strength, and drift risk.
 
@@ -199,6 +373,12 @@ sequenceDiagram
     Forge->>Workspace: write insight memo + opportunities
     Builder->>Forge: forge thesis create --source A --source B --source C
     Forge->>Workspace: write thesis
+    Builder->>Forge: forge adversarial audit thesis_signalforge-001
+    Forge->>Builder: display status + vulnerability + recommendation
+    Builder->>Forge: forge drift snapshot thesis_signalforge-001
+    Forge->>Workspace: record signal snapshot
+    Builder->>Forge: forge convergence scan
+    Forge->>Builder: display convergence points
     Builder->>Forge: forge decide evaluate thesis_signalforge-001 --explain
     Forge->>Workspace: write evaluation memo + scorecard
     Builder->>Forge: forge decide commit thesis_signalforge-001 --decision build
@@ -215,3 +395,5 @@ A valid SignalForge command should always do at least one of the following:
 - update portfolio state
 - improve decision clarity
 - prepare execution surfaces
+- strengthen adversarial resilience
+- capture temporal dynamics

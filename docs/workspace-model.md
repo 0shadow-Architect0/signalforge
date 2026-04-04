@@ -1,8 +1,8 @@
 # Workspace Model
 
 ## Why the workspace matters
-SignalForge should leave behind a strategic workspace, not a pile of disconnected files.
-The filesystem is part of the product experience because it encodes memory, provenance, and review rhythm.
+SignalForge should leave behind a strategic workspace, not just storage.
+It the filesystem is part of the product experience because it encodes memory, provenance, and review rhythm.
 
 ## Workspace topology
 ```mermaid
@@ -13,7 +13,7 @@ flowchart TD
     W --> O[opportunities/]
     W --> T[theses/]
     W --> D[decisions/]
-    W --> E[experiments/]
+    D --> E[experiments/]
     W --> P[portfolio/]
     W --> X[exports/]
     W --> Y[system/]
@@ -48,7 +48,9 @@ workspace/
     ├── runs/
     ├── index/
     ├── schemas/
-    └── manifests/
+    ├── manifests/
+    └── db/
+        └── signalforge.db
 ```
 
 ## Lifecycle
@@ -77,6 +79,28 @@ Structured JSON artifacts, schema versions, IDs, and deterministic manifests.
 ### System surface
 Run metadata, lineage edges, scores, freshness windows, and machine indexes.
 Evidence audits belong here operationally even when they are rendered as readable markdown under `decisions/evidence/`.
+
+### Persistence surface
+SQLite database storing snapshots time-series, portfolio reports history, and convergence events logs.
+Enables durable queries across workspace partitionsed data.
+
+## Semantic enrichment
+Every source and artifact can optionally receive LLM-powered deep enrichment when a semantic layer is enabled. This enrichment adds strategic summaries, extracted signals, domain classification, capability map, opportunity hints, risk indicators, and freshness assessment to the source payload without replacing deterministic analysis.
+
+ When disabled, all outputs remains deterministic-only.
+
+ this gives SignalForge a dual dual intelligence system: deterministic analysis as the surface plus LLM-powered deep understanding.
+
+ Evidence chain extraction adds argument structure to the source, not just keywords analysis.
+
+### Adversarial enrichment
+Every thesis receives adversarial audit, red team analysis, and bias detection. Status is green/yellow/orange/red with explicit kill criteria monitoring.
+
+### Drift enrichment
+Every thesis generates signal snapshots tracked over time with velocity, acceleration, momentum, and volatility computation.
+
+### Convergence enrichment
+The portfolio is scanned for convergence patterns across theses with pairwise overlap detection and emergent opportunity discovery.
 
 ## Naming discipline
 ```text
